@@ -128,18 +128,16 @@ namespace EntryLogManagement.SchoolPL.Utility
                     .Title("Chọn một tùy chọn[[[yellow]Quản lí Admin/Quản lí học sinh/Xem cảnh báo[/]]]")
                     .PageSize(10)
                     .AddChoices(new[] {
-                        "1. Lọc theo id học sinh",
-                        "2. Lọc theo thời gian",
-                        "3. Hiển thị tất cả",
+                        "1. Hiển thị bảng cảnh báo ngày hôm nay",
+                        "2. Hiển thị tất cả cảnh báo",
                         "0. Quay về trang trước đó"
                     }));
 
 
             int choice = choose switch
             {
-                "1. Lọc theo id học sinh" => 1,
-                "2. Lọc theo thời gian" => 2,
-                "3. Hiển thị tất cả" => 3,
+                "1. Hiển thị bảng cảnh báo ngày hôm nay" => 1,
+                "2. Hiển thị tất cả cảnh báo" => 2,
                 "0. Quay về trang trước đó" => 0,
                 _ => 0
             };
@@ -186,8 +184,7 @@ namespace EntryLogManagement.SchoolPL.Utility
                     .PageSize(10)
                     .AddChoices(new[] {
                         "1. Xem bảng học sinh ra vào",
-                        "2. Xem báo cáo đi muộn",
-                        "3. Điều chỉnh thời gian cảnh báo",
+                        "2. Điều chỉnh thời gian cảnh báo",
                         "0. Quay về trang trước đó"
                     }));
 
@@ -195,8 +192,7 @@ namespace EntryLogManagement.SchoolPL.Utility
             int choice = choose switch
             {
                 "1. Xem bảng học sinh ra vào" => 1,
-                "2. Xem báo cáo đi muộn" => 2,
-                "3. Điều chỉnh thời gian cảnh báo" => 3,
+                "2. Điều chỉnh thời gian cảnh báo" => 2,
                 "0. Quay về trang trước đó" => 0,
                 _ => 0
             };
@@ -232,31 +228,7 @@ namespace EntryLogManagement.SchoolPL.Utility
         }
 
 
-        public static int AdminEntryLogManagement2_2()
-        {
-            var choose = AnsiConsole.Prompt(
-                new SelectionPrompt<string>()
-                    .Title("Chọn một tùy chọn[[[yellow]Quản lí Admin/Quản lí ra vào/Báo cáo đi muộn[/]]]")
-                    .PageSize(10)
-                    .AddChoices(new[] {
-                "1. Hiển thị học sinh đi muộn trong ngày",
-                "2. Hiển thị theo id học sinh",
-                "3. Hiển thị theo thời gian",
-                "0. Quay về trang trước đó"
-                    }));
-
-            int choice = choose switch
-            {
-                "1. Hiển thị học sinh đi muộn trong ngày" => 1,
-                "2. Hiển thị theo id học sinh" => 2,
-                "3. Hiển thị theo thời gian" => 3,
-                "0. Quay về trang trước đó" => 0,
-                _ => 0
-            };
-
-            return choice;
-        }
-
+        
 
 
         // Menu admin -> bảng ra vào

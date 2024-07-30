@@ -6,23 +6,22 @@ using System.Text;
 using System.Threading.Tasks;
 using Spectre.Console;
 using TestMySql.Models;
+using EntryLogManagement.SchoolPL.Utility;
 
 namespace EntryLogManagement.SchoolPL
 {
     internal class StudentPL
     {
 
-        private readonly BaseService validateServices;
         private readonly StudentService studentService;
 
         public StudentPL()
         {
-            validateServices = new BaseService();
             studentService = new StudentService();
         }
         public void ShowStudentInforÌD()
         {
-            int id = validateServices.GetIntPrompt("NHập[green] id bạn muốn tìm:[/]");
+            int id = InputHepler.GetIntPrompt("Nhập[green] id : [/]");
 
             var students = studentService.GetStudentID(id);
 
@@ -39,10 +38,59 @@ namespace EntryLogManagement.SchoolPL
 
         public void ShowStudentInforClass()
         {
-            string lop = Console.ReadLine();
+            string lop = InputHepler.PromptUserInput("Nhập[green] tên lớp: [/]");
             var students = studentService.GetStudentClass(lop);
 
             StudentInfor_Table(students);
+        }
+
+        // Thêm học sinh
+        public void AddStudent()
+        {
+            var student = InputHepler.GetStudentAndParentInfo();
+
+            var result = studentService.AddStudent(student);
+
+            if(result)
+            {
+                AnsiConsole.Markup("[green]Bạn đã thêm học sinh thành công.[/]");
+            }
+            else
+            {
+                AnsiConsole.Markup("[green]Bạn đã thêm học sinh thất bại.[/]"); 
+            }
+        }
+
+        public void DeleteStudent()
+        {
+            int id = InputHepler.GetIntPrompt("Nhập[green] id : [/]");
+
+            var result = studentService.DeleteStudent(id);
+
+            if(result)
+            {
+                AnsiConsole.Markup("[green]Bạn đã xóa học sinh thành công.[/]"); 
+            }else
+            {
+                AnsiConsole.Markup("[green]Bạn đã xóa học sinh thất bại.[/]");
+            }
+        }
+
+        public void UpdateStudent()
+        {
+            var id = InputHepler.GetIntPrompt("Nhập[green] id : [/]");
+            var student = InputHepler.EnterStudent();
+
+            var result = studentService.UpdateStudent(student, id);
+
+            if (result)
+            {
+                AnsiConsole.Markup("[green]Bạn đã cập nhật học sinh thành công.[/]");  
+            }
+            else
+            {
+                AnsiConsole.Markup("[green]Bạn đã cập nhật học sinh thất bại.[/]");
+            }
         }
         public void StudentInfor_Table(List<Student> studentInfor)
         {

@@ -2,6 +2,7 @@
 using Spectre.Console;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,13 +20,13 @@ namespace EntryLogManagement.SchoolDAL
 
         // Chèn log
 
-        public bool InsertEntryLog(Entrylog log)
+        public async Task<bool> InsertEntryLogAsync(Entrylog log)
         {
             try
             {
                 using (var connection = GetConnection())
                 {
-                    connection.Open();
+                    await connection.OpenAsync();
 
                     string query = @"
                 INSERT INTO Entrylog (LogTime, StudentId, Status)
@@ -39,7 +40,7 @@ namespace EntryLogManagement.SchoolDAL
                         cmd.Parameters.AddWithValue("@Status", log.Status);
 
                         // Thực hiện câu lệnh
-                        int rowsAffected = cmd.ExecuteNonQuery();
+                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
 
                         // Kiểm tra xem có bản ghi nào được chèn hay không
                         return rowsAffected > 0;
@@ -54,7 +55,8 @@ namespace EntryLogManagement.SchoolDAL
             }
         }
 
-            // Hàm trả về tất cả entrylog theo id
+
+        // Hàm trả về tất cả entrylog theo id
         public List<Entrylog> GetEntryLogId(int id)
         {
             List<Entrylog> EntryLogs = new List<Entrylog>();
@@ -230,9 +232,9 @@ namespace EntryLogManagement.SchoolDAL
             return EntryLogs;
         }
 
-        public List<Entrylog> GetEntryLogToday()
+        // Hàm trả về học sinh theo range time cho phụ huynh 
+        public List<Entrylog> GetEntryLogRangeTimeForParent(DateTime timeStart, DateTime timeEnd , int id)
         {
-            DateTime today = DateTime.Now;
             List<Entrylog> EntryLogs = new List<Entrylog>();
 
             try
@@ -240,13 +242,16 @@ namespace EntryLogManagement.SchoolDAL
                 using (var connect = GetConnection())
                 {
                     connect.Open();
-                    //Lệnh truy vấn
-                    string query = "SELECT s.StudentId , s.Name , s.Class , e.LogTime , e.Status FROM entrylog as e inner join student as s on e.StudentId = s.StudentId where e.LogTime = @today order by e.Logtime DESC";
+                    // Tạo truy vấn
+                    string query = "SELECT s.StudentId , s.Name , s.Class , e.LogTime , e.Status FROM entrylog as e inner join student as s on e.StudentId = s.StudentId where e.LogTime >= @timeStart and e.LogTime <= @timeEnd and e.StudentId = @id order by e.LogTime DESC";
 
                     // Tạo command
                     using (var cmd = new MySqlCommand(query, connect))
                     {
-                        cmd.Parameters.AddWithValue("@today", today);
+                        cmd.Parameters.AddWithValue("@timeStart", timeStart);
+                        cmd.Parameters.AddWithValue("@timeEnd", timeEnd);
+                        cmd.Parameters.AddWithValue("@id", id);
+
                         // Thực hiện truy vấn
                         using (var reader = cmd.ExecuteReader())
                         {
@@ -281,6 +286,64 @@ namespace EntryLogManagement.SchoolDAL
             }
             return EntryLogs;
         }
+        public async Task<List<Entrylog>> GetEntryLogTodayAsync()
+        {
+            DateTime today = DateTime.Now.Date; // Get only the date part
+            List<Entrylog> EntryLogs = new List<Entrylog>();
+
+            try
+            {
+                using (var connect = GetConnection())
+                {
+                    await connect.OpenAsync();
+
+                    // Lệnh truy vấn
+                    string query = "SELECT s.StudentId, s.Name, s.Class, e.LogTime, e.Status " +
+                                   "FROM entrylog AS e " +
+                                   "INNER JOIN student AS s ON e.StudentId = s.StudentId " +
+                                   "WHERE DATE(e.LogTime) = @today " +
+                                   "ORDER BY e.LogTime DESC";
+
+                    // Tạo command
+                    using (var cmd = new MySqlCommand(query, connect))
+                    {
+                        cmd.Parameters.AddWithValue("@today", today);
+
+                        // Thực hiện truy vấn
+                        using (var reader = await cmd.ExecuteReaderAsync())
+                        {
+                            // Đọc dữ liệu truy vấn trả về
+                            while (await reader.ReadAsync())
+                            {
+                                // Tạo đối tượng Entrylog
+                                var log = new Entrylog
+                                {
+                                    StudentId = reader.GetInt32("StudentId"),
+                                    Student = new Student
+                                    {
+                                        Name = reader.GetString("Name"),
+                                        Class = reader.GetString("Class"),
+                                    },
+                                    LogTime = reader.GetDateTime("LogTime"),
+                                    Status = reader.GetString("Status")
+                                };
+
+                                // Thêm đối tượng Entrylog vào danh sách
+                                EntryLogs.Add(log);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.Markup($"[red]Đã xảy ra lỗi:[/] {ex.Message}");
+                AnsiConsole.WriteLine();
+            }
+
+            return EntryLogs;
+        }
+
 
         public List<Entrylog> GetEntryLogToAlert()
         {

@@ -11,12 +11,10 @@ namespace EntryLogManagement.SchoolPL
 {
     internal class AlertPL
     {
-        private readonly BaseService validateService;
         private readonly AlertService alertService;
 
         public AlertPL()
         {
-            validateService = new BaseService();
             alertService = new AlertService();
         }
 

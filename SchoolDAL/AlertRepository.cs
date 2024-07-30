@@ -16,8 +16,6 @@ namespace EntryLogManagement.SchoolDAL
 
         }
 
-
-
         public bool InsertAlert(int studentId, DateTime alertTime)
         {
             // Câu lệnh SQL để chèn dữ liệu vào bảng Alert

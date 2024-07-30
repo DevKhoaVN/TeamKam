@@ -1,40 +1,57 @@
 ﻿using EntryLogManagement.SchoolBLL;
 using EntryLogManagement.SchoolPL.Utility;
+using Spectre.Console;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TestMySql.Models;
 
 namespace EntryLogManagement.SchoolPL
 {
     internal class UserPL
     {
         private readonly UserService userService;
-        private readonly InputHepler inputHepler;
+       
 
         public UserPL()
         {
             userService = new UserService();
-            inputHepler = new InputHepler();
+          
 
         }
 
-        public int Login()
+        public User Login()
         {
-            string UserName = inputHepler.PromptUserInput("Nhập [green]UserName :[/]");
-            string Password = inputHepler.PromptUserInput("Nhập [green]Password :[/]");
+            string UserName = InputHepler.PromptUserInput("Nhập [green]UserName: [/]");
+            string Password = InputHepler.PromptUserInput("Nhập [green]Password: [/]");
+            Console.WriteLine();
 
             return userService.LoginUser(UserName, Password);
         }
 
         public  void Register()
         {
-            string UserName = inputHepler.PromptUserInput("Nhập [green]UserName :[/]");
-            string Password = inputHepler.PromptUserInput("Nhập [green]Password :[/]");
-            int ID = Convert.ToInt32(Console.ReadLine());
+            while(true)
+            {
+                string UserName = InputHepler.PromptUserInput("Nhập [green]UserName: [/]");
+                string Password = InputHepler.PromptUserInput("Nhập [green]Password: [/]");
+                int ID = InputHepler.GetIntPrompt("Nhập [green]ID của bạn : [/]");
+               
 
-            userService.RegisterUser(UserName, Password, ID);
+                var result = userService.RegisterUser(UserName, Password, ID);
+                if (result)
+                {
+                    AnsiConsole.Markup("[green]Bạn đã đăng kí thành công[/]");
+                    Console.WriteLine();
+                    break;
+                }
+                Console.WriteLine();
+            }
+           
+           
         }
     }
 }

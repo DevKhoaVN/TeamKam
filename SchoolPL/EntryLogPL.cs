@@ -1,4 +1,5 @@
 ﻿using EntryLogManagement.SchoolBLL;
+using EntryLogManagement.SchoolPL.Utility;
 using Spectre.Console;
 using System;
 using System.Collections.Generic;
@@ -11,18 +12,16 @@ namespace EntryLogManagement.SchoolPL
 {
     internal class EntryLogPL
     {
-        private readonly BaseService validateService;
         private readonly EntryLogService entryLogService;
 
         public EntryLogPL()
         {
-            validateService = new BaseService();
             entryLogService = new EntryLogService();
         }
 
         public void ShowEntryLogID()
         {
-            int id = validateService.GetIntPrompt("Nhập[green] id bạn muốn tìm kiếm : [/]");
+            int id = InputHepler.GetIntPrompt("Nhập[green] id bạn muốn tìm kiếm : [/]");
             var log =  entryLogService.GetEtryLogID(id);
 
             ShowEntrylog_Table(log);
@@ -36,8 +35,8 @@ namespace EntryLogManagement.SchoolPL
         }
         public void ShowEntryLogRangeTime()
         {
-            DateTime timeStart = validateService.GetDate("Nhập[green] ngày bắt đầu(dd/mm/yyyy): [/]");
-            DateTime timeEnd = validateService.GetDate("Nhập[green] ngày kết thúc(dd/mm/yyyy): [/]");
+            DateTime timeStart = InputHepler.GetDate("Nhập[green] ngày bắt đầu(dd/mm/yyyy): [/]");
+            DateTime timeEnd = InputHepler.GetDate("Nhập[green] ngày kết thúc(dd/mm/yyyy): [/]");
 
             var log = entryLogService.GetEntryLogRangeTime(timeStart, timeEnd);
 

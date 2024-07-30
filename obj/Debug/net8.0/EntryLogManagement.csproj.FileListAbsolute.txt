@@ -55,3 +55,4 @@ C:\Users\khoav\OneDrive\Máy tính\VTC\EntryLogManagement\obj\Debug\net8.0\refin
 C:\Users\khoav\OneDrive\Máy tính\VTC\EntryLogManagement\obj\Debug\net8.0\EntryLogManagement.pdb
 C:\Users\khoav\OneDrive\Máy tính\VTC\EntryLogManagement\obj\Debug\net8.0\EntryLogManagement.genruntimeconfig.cache
 C:\Users\khoav\OneDrive\Máy tính\VTC\EntryLogManagement\obj\Debug\net8.0\ref\EntryLogManagement.dll
+C:\Users\khoav\OneDrive\Máy tính\VTC\EntryLogManagement\obj\Debug\net8.0\EntryLogManagement.sourcelink.json

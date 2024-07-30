@@ -2,13 +2,15 @@
 using Spectre.Console;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TestMySql.Models;
 
 namespace EntryLogManagement.SchoolBLL
 {
-    internal class UserService : BaseService
+    internal class UserService 
     {
         private readonly HandleLogRepository handleLogRepository;
 
@@ -19,18 +21,32 @@ namespace EntryLogManagement.SchoolBLL
 
         public bool RegisterUser(string username, string password, int parentId)
         {
-            if (handleLogRepository.HandleUserName(username))
+            if (!handleLogRepository.HandleUserName(username))
             {
+                AnsiConsole.Markup("[red]UserName đã tồn tại[/]");
+                Console.WriteLine();
                 return false; // Tên người dùng đã tồn tại
             }
+
 
             return handleLogRepository.HandleRegister(username, password, parentId);
         }
 
-        public int LoginUser(string username , string password)
+        public User LoginUser(string username , string password)
         {
+            
 
-            return handleLogRepository.HandleLogin(username, password);
+             var user = handleLogRepository.HandleLogin(username, password);
+
+            if(user == null)
+            {
+                AnsiConsole.Markup("[red]Tài khoản không tồn tại.[/]");
+                Console.WriteLine();
+                Console.WriteLine();
+            }
+
+            return user;
+            
         }
     }
 }

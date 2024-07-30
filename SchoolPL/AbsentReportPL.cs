@@ -1,4 +1,5 @@
 ﻿using EntryLogManagement.SchoolBLL;
+using EntryLogManagement.SchoolPL.Utility;
 using Spectre.Console;
 using System;
 using System.Collections.Generic;
@@ -11,22 +12,26 @@ namespace EntryLogManagement.SchoolPL
 {
     internal class AbsentReportPL
     {
-        private readonly BaseService validateService;
         private readonly AbsentreportService absentreportService;
 
         public AbsentReportPL()
         {
-            validateService = new BaseService();
             absentreportService = new AbsentreportService();
         }
 
         public  void ShowAbsenReportID()
         {
-            int id = validateService.GetIntPrompt("Nhập[green] id tìm kiếm : [/]");
+            int id = InputHepler.GetIntPrompt("Nhập[green] id tìm kiếm : [/]");
 
+           
             var absent = absentreportService.GetReportID(id);
+            if (absent.Count <= 0)
+            {
+                Console.WriteLine("loi");
+            }
+              
 
-            ShowAbsentReport_Table(absent);
+                ShowAbsentReport_Table(absent);
         }
 
         public void ShowAbsenReportAll()
@@ -39,8 +44,8 @@ namespace EntryLogManagement.SchoolPL
 
         public void ShowAbsenReportRangeTime()
         {
-            DateTime timeStart = validateService.GetDate("Nhập[green] ngày bắt đầu(dd/mm/yyyy): [/]");
-            DateTime timeEnd = validateService.GetDate("Nhập[green] ngày kết thúc(dd/mm/yyyy): [/]");
+            DateTime timeStart = InputHepler.GetDate("Nhập[green] ngày bắt đầu(dd/mm/yyyy): [/]");
+            DateTime timeEnd = InputHepler.GetDate("Nhập[green] ngày kết thúc(dd/mm/yyyy): [/]");
 
             var absent = absentreportService.GetReportRangeTime(timeStart ,timeEnd);
 
@@ -61,7 +66,6 @@ namespace EntryLogManagement.SchoolPL
                 // Tạo bảng và thêm các cột
                 var table = new Table().Expand();
                 table.Title($"[#ffff00]Bảng báo cáo vắng học[/]");
-                table.AddColumn("ID học sinh");
                 table.AddColumn("Tên học sinh");
                 table.AddColumn("Tên phụ huynh");
                 table.AddColumn("Lớp");
@@ -74,9 +78,8 @@ namespace EntryLogManagement.SchoolPL
                 // Thêm các hàng vào bảng
                 foreach (var report in pageData)
                 {
-                    table.AddRow(
-                        $"{report.StudentId}", 
-                        $"{report.Parent.Students.Parent}",
+                    table.AddRow( 
+                        $"{report.Parent.Students.Name}",
                         $"{report.Parent.ParentName}",
                         $"{report.Parent.Students.Class}",
                         $"{report.CreateDay:yyyy-MM-dd}",

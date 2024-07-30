@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TestMySql.Models;
 
 namespace EntryLogManagement.SchoolDAL
 {
@@ -34,16 +35,14 @@ namespace EntryLogManagement.SchoolDAL
             catch (Exception ex)
             {
                 // Xử lý các lỗi khác
-                AnsiConsole.Markup($"[red]Lỗi: {ex.Message}[/]");
+                AnsiConsole.Markup($"[red]Lỗi: ID của bạn không hợp lệ.[/]");
                 AnsiConsole.WriteLine();
                 return false;
             }
         }
 
-        public int HandleLogin(string username, string password)
+        public User HandleLogin(string username, string password)
         {
-            int role = -1; // Giá trị trả về mặc định nếu không tìm thấy người dùng hoặc có lỗi
-
             try
             {
                 using (var connect = GetConnection())
@@ -52,7 +51,7 @@ namespace EntryLogManagement.SchoolDAL
                     connect.Open();
 
                     // Truy vấn kiểm tra tên đăng nhập và mật khẩu
-                    string query = @"SELECT RoleId FROM User WHERE UserName = @username AND Password = @password";
+                    string query = @"SELECT ParentId, RoleId FROM User WHERE UserName = @username AND Password = @password";
 
                     using (var cmd = new MySqlCommand(query, connect))
                     {
@@ -63,11 +62,17 @@ namespace EntryLogManagement.SchoolDAL
                         // Thực thi truy vấn và lấy dữ liệu
                         using (var reader = cmd.ExecuteReader())
                         {
+                            // Sử dụng if thay vì while vì chỉ cần kiểm tra một bản ghi
                             if (reader.Read())
                             {
-                                // Đọc giá trị RoleId nếu tìm thấy
-                                role = reader.GetInt32("RoleId");
+                                User user = new User
+                                {
+                                    ParentId = reader.IsDBNull(reader.GetOrdinal("ParentId")) ? -1 : reader.GetInt32("ParentId"),
+                                    RoleId = reader.IsDBNull(reader.GetOrdinal("RoleId")) ? -1 : reader.GetInt32("RoleId")
+                                };
+                                return user; // Trả về đối tượng User đã được tạo
                             }
+                            
                         }
                     }
                 }
@@ -75,12 +80,13 @@ namespace EntryLogManagement.SchoolDAL
             catch (Exception ex)
             {
                 // Xử lý các lỗi khác
-                AnsiConsole.Markup($"[red]Lỗi: {ex.Message}[/]");
+                AnsiConsole.Markup("[red]Tên đăng nhập hoặc mật khẩu không đúng![/]");
                 AnsiConsole.WriteLine();
             }
 
-            return role;
+            return null; // Trả về null nếu không đăng nhập thành công
         }
+
         public bool HandleUserName(string username)
         {
             try

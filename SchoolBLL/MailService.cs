@@ -5,6 +5,7 @@ using System.Net.Mail;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Spectre.Console;
 
 namespace EntryLogManagement.SchoolBLL
 {
@@ -33,12 +34,12 @@ namespace EntryLogManagement.SchoolBLL
                         _smtp.EnableSsl = true;
 
                         _smtp.Send(_mail);
-                        Console.WriteLine($"Email đã được gửi thành công tới {Toemail}.");
+                       
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Gửi email thất bại tới {Toemail}. Lỗi: {ex.Message}");
+                   AnsiConsole.Markup("{[red]Gửi email thất bại tới.[red] ");
                     // Handle or log the exception appropriately for your application
                 }
             }

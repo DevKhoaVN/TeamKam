@@ -7,8 +7,6 @@ public partial class Absentreport
 {
     public int AbsentReportId { get; set; }
 
-    public int StudentId { get; set; }
-
     public int ParentId { get; set; }
 
     public DateTime CreateDay { get; set; }

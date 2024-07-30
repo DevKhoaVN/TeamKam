@@ -19,7 +19,12 @@ namespace EntryLogManagement.SchoolBLL
 
         public List<Absentreport> GetReportID(int id)
         {
-            return absentreportRepository.GetAbsenreportid(id);
+            var  ab = absentreportRepository.GetAbsenreportid(id);
+           if (ab.Count <= 0)
+            {
+                Console.WriteLine("Loi");
+            }
+            return ab;
         }
 
         public List<Absentreport> GetReportAll()
@@ -31,5 +36,11 @@ namespace EntryLogManagement.SchoolBLL
         {
             return absentreportRepository.GetAbsenreportRangeTime(timeStart, timeEnd);
         }
+
+        public List<Absentreport> GetReportRangeTimeForParent(DateTime timeStart, DateTime timeEnd , int id)
+        {
+            return absentreportRepository.GetAbsenreportRangeTimeForParent(timeStart, timeEnd , id);
+        }
+
     }
 }

@@ -12,7 +12,7 @@ namespace EntryLogManagement.SchoolDAL
     internal class StudentRepository : BaseRposiorty
     {
 
-        public StudentRepository(): base()
+        public StudentRepository() : base()
         {
 
         }
@@ -24,60 +24,52 @@ namespace EntryLogManagement.SchoolDAL
                 using (var connect = GetConnection())
                 {
                     connect.Open();
-                    var transaction = connect.BeginTransaction();
-                    try
+
+                    // Thêm phụ huynh và lấy ID phụ huynh
+                    string queryParent = @"
+                INSERT INTO Parent (ParentName, ParentEmail, ParentPhone, ParentAddress) 
+                VALUES (@ParentName, @ParentEmail, @ParentPhone, @ParentAddress); 
+                SELECT LAST_INSERT_ID();";
+
+                    int parentId;
+
+                    using (var cmd = new MySqlCommand(queryParent, connect))
                     {
-                        // Thêm phụ huynh và lấy ID phụ huynh
-                        string queryParent = "INSERT INTO Parent (ParentName, ParentEmail, ParentPhone, ParentAddress) VALUES (@ParentName, @ParentEmail, @ParentPhone, @ParentAddress) SELECT LAST_INSERT_ID()"; // Lấy ID phụ huynh vừa thêm
+                        cmd.Parameters.AddWithValue("@ParentName", student.Parent.ParentName);
+                        cmd.Parameters.AddWithValue("@ParentEmail", student.Parent.ParentEmail);
+                        cmd.Parameters.AddWithValue("@ParentPhone", student.Parent.ParentPhone);
+                        cmd.Parameters.AddWithValue("@ParentAddress", student.Parent.ParentAddress);
 
-                        int parentId;
-
-                        using (var cmd = new MySqlCommand(queryParent, connect, transaction))
-                        {
-                            cmd.Parameters.AddWithValue("@ParentName", student.Parent.ParentName);
-                            cmd.Parameters.AddWithValue("@ParentEmail", student.Parent.ParentEmail);
-                            cmd.Parameters.AddWithValue("@ParentPhone", student.Parent.ParentPhone);
-                            cmd.Parameters.AddWithValue("@ParentAddress", student.Parent.ParentAddress);
-
-                            // Thực hiện truy vấn và lấy ID phụ huynh
-                            parentId = Convert.ToInt32(cmd.ExecuteScalar());
-                        }
-
-                        // Thêm sinh viên với ID phụ huynh vừa lấy
-                        string queryStudent = "INSERT INTO Student (ParentId, Name, Gender, DayOfBirth, Class, Address, Phone, JoinDay) VALUES (@ParentId, @Name, @Gender, @DayOfBirth, @Class, @Address, @Phone, @JoinDay)";
-
-                        using (var cmd = new MySqlCommand(queryStudent, connect, transaction))
-                        {
-                            cmd.Parameters.AddWithValue("@ParentId", parentId);
-                            cmd.Parameters.AddWithValue("@Name", student.Name);
-                            cmd.Parameters.AddWithValue("@Gender", student.Gender);
-                            cmd.Parameters.AddWithValue("@DayOfBirth", student.DayOfBirth);
-                            cmd.Parameters.AddWithValue("@Class", student.Class);
-                            cmd.Parameters.AddWithValue("@Address", student.Address);
-                            cmd.Parameters.AddWithValue("@Phone", student.Phone);
-                            cmd.Parameters.AddWithValue("@JoinDay", student.JoinDay);
-
-                            // Thực hiện truy vấn
-                            cmd.ExecuteNonQuery();
-                        }
-
-                        // Commit giao dịch
-                        transaction.Commit();
-                        return true;
+                        // Thực hiện truy vấn và lấy ID phụ huynh
+                        parentId = Convert.ToInt32(cmd.ExecuteScalar());
                     }
-                    catch (Exception ex)
+
+                    // Thêm sinh viên với ID phụ huynh vừa lấy
+                    string queryStudent = @"
+                INSERT INTO Student (ParentId, Name, Gender, DayOfBirth, Class, Address, Phone, JoinDay) 
+                VALUES (@ParentId, @Name, @Gender, @DayOfBirth, @Class, @Address, @Phone, @JoinDay);";
+
+                    using (var cmd = new MySqlCommand(queryStudent, connect))
                     {
-                        // Rollback giao dịch nếu có lỗi
-                        transaction.Rollback();
-                        AnsiConsole.Markup($"[red]Đã xảy ra lỗi:[/] {ex.Message}");
-                        AnsiConsole.WriteLine();
-                        return false;
+                        cmd.Parameters.AddWithValue("@ParentId", parentId);
+                        cmd.Parameters.AddWithValue("@Name", student.Name);
+                        cmd.Parameters.AddWithValue("@Gender", student.Gender);
+                        cmd.Parameters.AddWithValue("@DayOfBirth", student.DayOfBirth);
+                        cmd.Parameters.AddWithValue("@Class", student.Class);
+                        cmd.Parameters.AddWithValue("@Address", student.Address);
+                        cmd.Parameters.AddWithValue("@Phone", student.Phone);
+                        cmd.Parameters.AddWithValue("@JoinDay", student.JoinDay);
+
+                        // Thực hiện truy vấn
+                        cmd.ExecuteNonQuery();
                     }
+
+                    return true;
                 }
             }
             catch (Exception ex)
             {
-                AnsiConsole.Markup($"[red]Đã xảy ra lỗi kết nối cơ sở dữ liệu:[/] {ex.Message}");
+                AnsiConsole.Markup($"[red]Đã xảy ra lỗi:[/] {ex.Message}");
                 AnsiConsole.WriteLine();
                 return false;
             }
@@ -93,29 +85,23 @@ namespace EntryLogManagement.SchoolDAL
                 using (var connect = GetConnection())
                 {
                     connect.Open();
-                    var transaction = connect.BeginTransaction();
-
 
                     // Xóa phụ huynh trước
-                    string queryDeleteParent = "DELETE FROM Parent WHERE ParentId = @StudentId)";
-                    using (var cmdDeleteParent = new MySqlCommand(queryDeleteParent, connect, transaction))
+                    string queryDeleteParent = "DELETE FROM Parent WHERE ParentId = (SELECT ParentId FROM Student WHERE StudentId = @StudentId)";
+                    using (var cmdDeleteParent = new MySqlCommand(queryDeleteParent, connect))
                     {
                         cmdDeleteParent.Parameters.AddWithValue("@StudentId", studentId);
                         cmdDeleteParent.ExecuteNonQuery();
                     }
 
-                    // Xóa học sinh trước
+                    // Xóa học sinh
                     string queryDeleteStudent = "DELETE FROM Student WHERE StudentId = @StudentId";
-                    using (var cmdDeleteStudent = new MySqlCommand(queryDeleteStudent, connect, transaction))
+                    using (var cmdDeleteStudent = new MySqlCommand(queryDeleteStudent, connect))
                     {
                         cmdDeleteStudent.Parameters.AddWithValue("@StudentId", studentId);
                         cmdDeleteStudent.ExecuteNonQuery();
                     }
 
-
-
-                    // Xác nhận transaction
-                    transaction.Commit();
                     return true;
                 }
             }
@@ -129,14 +115,13 @@ namespace EntryLogManagement.SchoolDAL
 
         // update
 
-        public bool UpdateStudent(Student student)
+        public bool UpdateStudent(Student student, int studentId)
         {
             try
             {
                 using (var connect = GetConnection())
                 {
                     connect.Open();
-                    var transaction = connect.BeginTransaction();
 
                     // Cập nhật phụ huynh trước
                     string queryUpdateParent = @"
@@ -147,13 +132,13 @@ namespace EntryLogManagement.SchoolDAL
                     ParentAddress = COALESCE(NULLIF(@ParentAddress, ''), ParentAddress)
                 WHERE ParentId = @ParentId";
 
-                    using (var cmdUpdateParent = new MySqlCommand(queryUpdateParent, connect, transaction))
+                    using (var cmdUpdateParent = new MySqlCommand(queryUpdateParent, connect))
                     {
                         cmdUpdateParent.Parameters.AddWithValue("@ParentId", student.Parent.ParentId);
-                        cmdUpdateParent.Parameters.AddWithValue("@ParentName", student.Parent.ParentName);
-                        cmdUpdateParent.Parameters.AddWithValue("@ParentEmail", student.Parent.ParentEmail);
-                        cmdUpdateParent.Parameters.AddWithValue("@ParentPhone", student.Parent.ParentPhone);
-                        cmdUpdateParent.Parameters.AddWithValue("@ParentAddress", student.Parent.ParentAddress);
+                        cmdUpdateParent.Parameters.AddWithValue("@ParentName", student.Parent.ParentName ?? (object)DBNull.Value);
+                        cmdUpdateParent.Parameters.AddWithValue("@ParentEmail", student.Parent.ParentEmail ?? (object)DBNull.Value);
+                        cmdUpdateParent.Parameters.AddWithValue("@ParentPhone", student.Parent.ParentPhone == 0 ? (object)DBNull.Value : student.Parent.ParentPhone);
+                        cmdUpdateParent.Parameters.AddWithValue("@ParentAddress", student.Parent.ParentAddress ?? (object)DBNull.Value);
                         cmdUpdateParent.ExecuteNonQuery();
                     }
 
@@ -170,22 +155,20 @@ namespace EntryLogManagement.SchoolDAL
                     JoinDay = COALESCE(NULLIF(@JoinDay, '0001-01-01'), JoinDay)
                 WHERE StudentId = @StudentId";
 
-                    using (var cmdUpdateStudent = new MySqlCommand(queryUpdateStudent, connect, transaction))
+                    using (var cmdUpdateStudent = new MySqlCommand(queryUpdateStudent, connect))
                     {
-                        cmdUpdateStudent.Parameters.AddWithValue("@StudentId", student.StudentId);
-                        cmdUpdateStudent.Parameters.AddWithValue("@ParentId", student.ParentId);
-                        cmdUpdateStudent.Parameters.AddWithValue("@Name", student.Name);
-                        cmdUpdateStudent.Parameters.AddWithValue("@Gender", student.Gender);
+                        cmdUpdateStudent.Parameters.AddWithValue("@StudentId", studentId);
+                        cmdUpdateStudent.Parameters.AddWithValue("@ParentId", student.ParentId == 0 ? (object)DBNull.Value : student.ParentId);
+                        cmdUpdateStudent.Parameters.AddWithValue("@Name", student.Name ?? (object)DBNull.Value);
+                        cmdUpdateStudent.Parameters.AddWithValue("@Gender", student.Gender ?? (object)DBNull.Value);
                         cmdUpdateStudent.Parameters.AddWithValue("@DayOfBirth", student.DayOfBirth == DateTime.MinValue ? (object)DBNull.Value : student.DayOfBirth);
-                        cmdUpdateStudent.Parameters.AddWithValue("@Class", student.Class);
-                        cmdUpdateStudent.Parameters.AddWithValue("@Address", student.Address);
-                        cmdUpdateStudent.Parameters.AddWithValue("@Phone", student.Phone);
+                        cmdUpdateStudent.Parameters.AddWithValue("@Class", student.Class ?? (object)DBNull.Value);
+                        cmdUpdateStudent.Parameters.AddWithValue("@Address", student.Address ?? (object)DBNull.Value);
+                        cmdUpdateStudent.Parameters.AddWithValue("@Phone", student.Phone == 0 ? (object)DBNull.Value : student.Phone);
                         cmdUpdateStudent.Parameters.AddWithValue("@JoinDay", student.JoinDay == DateTime.MinValue ? (object)DBNull.Value : student.JoinDay);
                         cmdUpdateStudent.ExecuteNonQuery();
                     }
 
-                    // Commit transaction
-                    transaction.Commit();
                     return true;
                 }
             }
@@ -196,6 +179,7 @@ namespace EntryLogManagement.SchoolDAL
                 return false;
             }
         }
+
 
 
         public List<Student> GetStudentId(int id)
@@ -237,7 +221,7 @@ namespace EntryLogManagement.SchoolDAL
                                     {
                                         ParentName = reader.GetString("ParentName"),
                                         ParentEmail = reader.GetString("ParentEmail"),
-                                        ParentPhone = reader.GetInt32("ParentPhone"), 
+                                        ParentPhone = reader.GetInt32("ParentPhone"),
                                         ParentAddress = reader.GetString("ParentAddress")
                                     }
                                 };
@@ -295,7 +279,7 @@ namespace EntryLogManagement.SchoolDAL
                                     {
                                         ParentName = reader.GetString("ParentName"),
                                         ParentEmail = reader.GetString("ParentEmail"),
-                                        ParentPhone = reader.GetInt32("ParentPhone"), 
+                                        ParentPhone = reader.GetInt32("ParentPhone"),
                                         ParentAddress = reader.GetString("ParentAddress")
                                     }
                                 };
@@ -309,7 +293,7 @@ namespace EntryLogManagement.SchoolDAL
             }
             catch (Exception ex)
             {
-                AnsiConsole.Markup($"[red][ERROR]: Đã xảy ra lỗi:[/] {ex.Message}");
+                AnsiConsole.Markup($"[red][ERROR]: Đã xảy ra lỗi:[/]");
                 AnsiConsole.WriteLine();
             }
 
@@ -356,7 +340,7 @@ namespace EntryLogManagement.SchoolDAL
                                     {
                                         ParentName = reader.GetString("ParentName"),
                                         ParentEmail = reader.GetString("ParentEmail"),
-                                        ParentPhone = reader.GetInt32("ParentPhone"), 
+                                        ParentPhone = reader.GetInt32("ParentPhone"),
                                         ParentAddress = reader.GetString("ParentAddress")
                                     }
                                 };

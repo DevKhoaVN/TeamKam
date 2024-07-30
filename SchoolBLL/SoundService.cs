@@ -23,8 +23,7 @@ namespace EntryLogManagement.SchoolBLL
                     outputDevice.Init(audioFile);
                     outputDevice.Play();
 
-                    int IsCount = 0;
-                    AnsiConsole.Markup("Nhấn[green] enter để dừng âm thanh cảnh báo.[/]");
+                    int IsCount = 0;       
 
                     while (outputDevice.PlaybackState == PlaybackState.Playing && IsCount <= 5)
                     {
