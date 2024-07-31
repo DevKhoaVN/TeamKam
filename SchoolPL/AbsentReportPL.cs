@@ -66,6 +66,7 @@ namespace EntryLogManagement.SchoolPL
                 // Tạo bảng và thêm các cột
                 var table = new Table().Expand();
                 table.Title($"[#ffff00]Bảng báo cáo vắng học[/]");
+                table.AddColumn("ID học sinh");
                 table.AddColumn("Tên học sinh");
                 table.AddColumn("Tên phụ huynh");
                 table.AddColumn("Lớp");
@@ -78,7 +79,8 @@ namespace EntryLogManagement.SchoolPL
                 // Thêm các hàng vào bảng
                 foreach (var report in pageData)
                 {
-                    table.AddRow( 
+                    table.AddRow(
+                        $"{report.Parent.Students.StudentId}",
                         $"{report.Parent.Students.Name}",
                         $"{report.Parent.ParentName}",
                         $"{report.Parent.Students.Class}",
@@ -120,6 +122,7 @@ namespace EntryLogManagement.SchoolPL
                 }
             }
         }
+
 
 
     }

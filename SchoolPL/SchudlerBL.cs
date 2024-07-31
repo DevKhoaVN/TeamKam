@@ -17,12 +17,6 @@ namespace EntryLogManagement.SchoolPL
         
         }
 
-        // Start the scheduler asynchronously
-        public async Task RunSchedulerAsync()
-        {
-            await _schedulerService.StartScheduler();
-        }
-
         // Adjust the scheduler's time
         public async Task AdjustTimeSchedulerAsync()
         {
@@ -32,12 +26,15 @@ namespace EntryLogManagement.SchoolPL
 
             int hour2 = InputHepler.GetValidHour("Nhập [green]giờ bạn muốn thay đổi (buổi chiều)[/]: ");
             int minutes2 = InputHepler.GetValidMinute("Nhập [green]phút bạn muốn thay đổi (buổi chiều)[/]: ");
+
+            await Console.Out.WriteLineAsync();
             try
             {
                 var scheduler = await StdSchedulerFactory.GetDefaultScheduler();
                 await scheduler.Shutdown(true);
 
                 await _schedulerService.StartScheduler(hour1, minutes1, hour2, minutes2);
+               
             }
             catch (Exception ex)
             {
@@ -45,5 +42,7 @@ namespace EntryLogManagement.SchoolPL
                 AnsiConsole.WriteLine();
             }
         }
+
     }
 }
+

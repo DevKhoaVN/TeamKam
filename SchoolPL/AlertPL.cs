@@ -48,9 +48,11 @@ namespace EntryLogManagement.SchoolPL
                 // Tạo bảng và thêm các cột
                 var table = new Table().Expand();
                 table.Title($"[#ffff00]Danh sách cảnh báo[/]").HeavyEdgeBorder();
-                table.AddColumn("ID học sinh");
                 table.AddColumn("Tên học sinh");
                 table.AddColumn("Lớp");
+                table.AddColumn("Tên phụ huynh");
+                table.AddColumn("Số điện thoại");
+                table.AddColumn("Địa chỉ");
                 table.AddColumn("Thời gian cảnh báo");
 
                 // Tính toán các dòng cần hiển thị trên trang hiện tại
@@ -60,9 +62,11 @@ namespace EntryLogManagement.SchoolPL
                 foreach (var alert in pageData)
                 {
                     table.AddRow(
-                        $"{alert.AlertId}", // Thay AlertId bằng thuộc tính ID của cảnh báo
                         $"{alert.Student.Name}",
                         $"{alert.Student.Class}",
+                        $"{alert.Student.Parent.ParentName}",
+                        $"{alert.Student.Parent.ParentPhone}",
+                        $"{alert.Student.Parent.ParentAddress}",
                         $"{alert.AlertTime:yyyy-MM-dd HH:mm:ss}"
                     );
                 }

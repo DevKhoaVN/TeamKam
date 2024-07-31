@@ -13,10 +13,13 @@ namespace EntryLogManagement.SchoolPL
     internal class EntryLogPL
     {
         private readonly EntryLogService entryLogService;
+        private readonly CameraService cameraService;
 
-        public EntryLogPL()
+       public EntryLogPL()
         {
             entryLogService = new EntryLogService();
+            cameraService = new CameraService();
+
         }
 
         public void ShowEntryLogID()
@@ -42,6 +45,50 @@ namespace EntryLogManagement.SchoolPL
 
             ShowEntrylog_Table(log);
         }
+
+        public void RecoredEntryLog()
+        {
+            while (true)
+            {
+                // Hiển thị hướng dẫn và chờ người dùng nhập dữ liệu
+                AnsiConsole.MarkupLine("Nhập mã QR của sinh viên và nhấn [green]Enter[/] để ghi nhận hoặc chỉ nhấn [green]Enter[/] để thoát:\n");
+
+                // Đọc phím nhấn từ người dùng
+                var key = Console.ReadKey(intercept: true);
+
+                // Nếu phím nhấn là Enter, thoát khỏi vòng lặp
+                if (key.Key == ConsoleKey.Enter)
+                {
+                    AnsiConsole.MarkupLine("[green]Đã thoát khỏi chế độ ghi nhận lịch sử.[/]\n");
+                    break;
+                }
+
+                // Nếu không phải phím Enter, yêu cầu nhập mã QR
+                var input = AnsiConsole.Ask<string>("Nhập mã QR của sinh viên: ");
+
+                // Chuyển đổi input thành số nguyên (ID sinh viên)
+                if (int.TryParse(input, out int qrId))
+                {
+                    // Gọi phương thức TurnOn để ghi nhận log
+                    bool isSuccess = cameraService.TurnOn(qrId);
+
+                    // Thông báo kết quả với xuống dòng
+                    if (isSuccess)
+                    {
+                        AnsiConsole.MarkupLine("[green]Lịch sử ra vào đã được ghi nhận thành công.[/]\n");
+                    }
+                    else
+                    {
+                        AnsiConsole.MarkupLine("[red]Lỗi khi ghi nhận lịch sử ra vào.[/]\n");
+                    }
+                }
+                else
+                {
+                    AnsiConsole.MarkupLine("[red]Mã QR không hợp lệ. Vui lòng nhập lại.[/]\n");
+                }
+            }
+        }
+
 
         public void ShowEntrylog_Table(List<Entrylog> entryLogs)
         {

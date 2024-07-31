@@ -172,6 +172,44 @@ namespace EntryLogManagement.SchoolPL.Utility
 
             return result;
         }
+        // vadidatw sp nguyen
+        public static int GetIntPrompt()
+        {
+            int result = -1;  // Khởi tạo với một giá trị không hợp lệ
+            bool isValid = false;  // Cờ kiểm tra hợp lệ
+
+            do
+            {
+                // Thông báo mặc định cho người dùng
+                string prompt = "Nhập [green]ID học sinh muốn gửi báo cáo (hoặc nhấn Enter để bỏ qua, mặc định là 0):[/]";
+
+                // Nhận chuỗi đầu vào từ người dùng
+                var input = AnsiConsole.Prompt(
+                    new TextPrompt<string>(prompt)
+                        .PromptStyle("green")
+                        .ValidationErrorMessage("[red]Vui lòng nhập một số nguyên hoặc để trống![/]")
+                        .AllowEmpty());
+
+                // Kiểm tra nếu người dùng không nhập gì
+                if (string.IsNullOrWhiteSpace(input))
+                {
+                    result = 0;  // Gán giá trị mặc định
+                    isValid = true;  // Đánh dấu là hợp lệ
+                }
+                else
+                {
+                    // Thử chuyển đổi chuỗi thành số nguyên
+                    isValid = int.TryParse(input, out result) && result >= 0;
+                    if (!isValid)
+                    {
+                        AnsiConsole.Markup("[red]ID không hợp lệ, vui lòng nhập một số nguyên không âm![/]");
+                    }
+                }
+
+            } while (!isValid);  // Tiếp tục cho đến khi người dùng nhập giá trị hợp lệ
+
+            return result;
+        }
 
         public static DateTime GetDate(string prompt)
         {

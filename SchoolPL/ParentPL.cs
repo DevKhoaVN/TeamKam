@@ -38,25 +38,27 @@ namespace EntryLogManagement.SchoolPL
             ShowEntrylog_Table(logforparent);
         }
 
-
         public void SendReport(int id)
         {
             var message = InputHepler.PromptUserInput("Nhập[green] lí do vắng học: [/]");
 
-           var result =  parentService.SendAbentReport(message, id);
+            var result = parentService.SendAbentReport(message, id);
 
-            if(result)
+            if (result)
             {
-                AnsiConsole.Markup("[green]Gửi báo cáo vắng học thành công.[/]");
+           
+                AnsiConsole.MarkupLine("[green]Gửi báo cáo vắng học thành công.[/]");
+                AnsiConsole.WriteLine();
             }
             else
             {
-                AnsiConsole.Markup("[green]Gửi báo cáo vắng học thất bại.[/]");
+                AnsiConsole.MarkupLine("[green]Gửi báo cáo vắng học thất bại.[/]");
+                AnsiConsole.WriteLine();
             }
         }
         public void ShowAbsentStudentAll(int id )
         {
-            var absentforparent = absentreportService.GetReportID(id);
+            var absentforparent = absentreportService.GetReportIDParent(id);
 
             ShowAbsentReport_Table(absentforparent);
         }
@@ -160,7 +162,6 @@ namespace EntryLogManagement.SchoolPL
                 var table = new Table().Expand();
                 table.Title($"[#ffff00]Bảng báo cáo vắng học[/]");
                 table.AddColumn("ID học sinh");
-                table.AddColumn("Tên học sinh");
                 table.AddColumn("Tên phụ huynh");
                 table.AddColumn("Lớp");
                 table.AddColumn("Ngày báo cáo");
@@ -173,12 +174,12 @@ namespace EntryLogManagement.SchoolPL
                 foreach (var report in pageData)
                 {
                     table.AddRow(
-                        $"{report.Parent.Students.Parent}",
+                        $"{report.StudentId}",
                         $"{report.Parent.ParentName}",
                         $"{report.Parent.Students.Class}",
                         $"{report.CreateDay:yyyy-MM-dd}",
                         $"{report.Reason}"
-                    );
+                    ); 
                 }
 
                 // Hiển thị bảng

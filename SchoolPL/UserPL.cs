@@ -25,11 +25,24 @@ namespace EntryLogManagement.SchoolPL
 
         public User Login()
         {
-            string UserName = InputHepler.PromptUserInput("Nhập [green]UserName: [/]");
-            string Password = InputHepler.PromptUserInput("Nhập [green]Password: [/]");
-            Console.WriteLine();
+            while (true)
+            {
+                string UserName = InputHepler.PromptUserInput("Nhập [green]UserName: [/]");
+                string Password = InputHepler.PromptUserInput("Nhập [green]Password: [/]");
+                Console.WriteLine();
 
-            return userService.LoginUser(UserName, Password);
+                var reuslt =  userService.LoginUser(UserName, Password);
+
+                if (reuslt != null)
+                {
+                    AnsiConsole.MarkupLine("[green]Bạn đã đăng nhập thành công[/]");
+                    return reuslt;
+                    break;
+                }
+                
+            }
+                
+            
         }
 
         public  void Register()

@@ -29,28 +29,18 @@ namespace EntryLogManagement.SchoolBLL
             return entryLogRepository.GetEntryLogRangeTimeForParent(timeStart , timeEnd , id);
         }
 
-        public bool SendAbentReport(string Message , int ParentId)
+        public bool SendAbentReport(string Message, int ParentId)
         {
-            if(absentreportRepository.InsertAbsentReport(Message , ParentId))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+             return absentreportRepository.InsertAbsentReport(Message, ParentId);
+           
         }
+
+
 
         public List<Absentreport> ShowAbsentReport( int id)
         {
             return absentreportRepository.GetAbsenreportid(id);
-        }
-
-        public List<Absentreport> ShowAbsentReportRangeTime(DateTime timeStart , DateTime timeEnd , int id)
-        {
-            return absentreportRepository.GetAbsenreportRangeTimeForParent(timeStart, timeEnd, id);
-        }
-
+        }  
 
 
     }

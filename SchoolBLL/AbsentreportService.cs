@@ -22,10 +22,22 @@ namespace EntryLogManagement.SchoolBLL
             var  ab = absentreportRepository.GetAbsenreportid(id);
            if (ab.Count <= 0)
             {
-                Console.WriteLine("Loi");
+                Console.WriteLine("Lỗi");
             }
             return ab;
         }
+
+
+        public List<Absentreport> GetReportIDParent(int id)
+        {
+            var ab = absentreportRepository.GetAbsenreportidParent(id);
+            if (ab.Count <= 0)
+            {
+                Console.WriteLine("Lỗi");
+            }
+            return ab;
+        }
+
 
         public List<Absentreport> GetReportAll()
         {
@@ -37,10 +49,7 @@ namespace EntryLogManagement.SchoolBLL
             return absentreportRepository.GetAbsenreportRangeTime(timeStart, timeEnd);
         }
 
-        public List<Absentreport> GetReportRangeTimeForParent(DateTime timeStart, DateTime timeEnd , int id)
-        {
-            return absentreportRepository.GetAbsenreportRangeTimeForParent(timeStart, timeEnd , id);
-        }
+       
 
     }
 }

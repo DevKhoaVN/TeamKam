@@ -35,18 +35,9 @@ namespace EntryLogManagement.SchoolBLL
         public User LoginUser(string username , string password)
         {
             
+             return  handleLogRepository.HandleLogin(username, password);
 
-             var user = handleLogRepository.HandleLogin(username, password);
-
-            if(user == null)
-            {
-                AnsiConsole.Markup("[red]Tài khoản không tồn tại.[/]");
-                Console.WriteLine();
-                Console.WriteLine();
-            }
-
-            return user;
-            
+                       
         }
     }
 }

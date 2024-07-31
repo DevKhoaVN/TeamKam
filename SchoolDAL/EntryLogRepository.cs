@@ -20,17 +20,17 @@ namespace EntryLogManagement.SchoolDAL
 
         // Chèn log
 
-        public async Task<bool> InsertEntryLogAsync(Entrylog log)
+        public bool InsertEntryLog(Entrylog log)
         {
             try
             {
                 using (var connection = GetConnection())
                 {
-                    await connection.OpenAsync();
+                    connection.Open(); // Mở kết nối đồng bộ
 
                     string query = @"
-                INSERT INTO Entrylog (LogTime, StudentId, Status)
-                VALUES (@LogTime, @StudentId, @Status)";
+            INSERT INTO Entrylog (LogTime, StudentId, Status)
+            VALUES (@LogTime, @StudentId, @Status)";
 
                     using (var cmd = new MySqlCommand(query, connection))
                     {
@@ -39,8 +39,8 @@ namespace EntryLogManagement.SchoolDAL
                         cmd.Parameters.AddWithValue("@StudentId", log.StudentId);
                         cmd.Parameters.AddWithValue("@Status", log.Status);
 
-                        // Thực hiện câu lệnh
-                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                        // Thực hiện câu lệnh đồng bộ
+                        int rowsAffected = cmd.ExecuteNonQuery();
 
                         // Kiểm tra xem có bản ghi nào được chèn hay không
                         return rowsAffected > 0;
@@ -75,7 +75,7 @@ namespace EntryLogManagement.SchoolDAL
                         e.Status 
                     FROM entrylog as e 
                     INNER JOIN student as s ON e.StudentId = s.StudentId 
-                    WHERE e.StudentId = @id 
+                    WHERE s.ParentId = @id 
                     ORDER BY e.LogTime DESC";
 
                     // Tạo command

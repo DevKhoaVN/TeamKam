@@ -138,7 +138,7 @@ namespace EntryLogManagement.SchoolDAL
                     connect.Open();
 
                     //Lệnh truy vấn
-                    string query = " select s.Name  , s.Class, p.ParentName ,p.ParentPhone ,  p.ParentAddress , p.ParentEmail , a.AlertTime from alert as a inner join student as s on a.StudentId = s.StudentId inner join parent as p on s.StudentId = p.ParentId order by a.AlertTime desc";
+                    string query = " select s.Name , s.Class, p.ParentName ,p.ParentPhone ,  p.ParentAddress , p.ParentEmail , a.AlertTime from alert as a inner join student as s on a.StudentId = s.StudentId inner join parent as p on s.StudentId = p.ParentId order by a.AlertTime desc";
                     // Tạo command
                     using (var cmd = new MySqlCommand(query, connect))
                     {

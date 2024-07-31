@@ -7,7 +7,7 @@ using System.Text;
 internal class Program
 {
 
-    public static async Task Main(string[] args)
+    public static void Main(string[] args)
     {
         
 
@@ -51,18 +51,16 @@ internal class Program
                     {
                          role = user.RoleId;
                          parentid = user.ParentId;
-                    }
-                   
-                    
+                    }               
                         switch (role)
                         {
                             //Thao tác của admin
                             case 1:
-
+                            int hour1 = 0, minute1 = 4 , hour2 = 18, minute2 = 1;
                             SchedulerService s = new SchedulerService();
-                            s.StartScheduler();
-                              /**/
-                                bool isCheckAdmin = true;
+                             s.StartScheduler(hour1, minute1, hour2, minute2);
+
+                            bool isCheckAdmin = true;
 
                                 while (isCheckAdmin)
                                 {
@@ -288,7 +286,7 @@ internal class Program
                                                     case 2:
 
                                                     SchudlerBL schudlerBL = new SchudlerBL();
-                                                    await schudlerBL.AdjustTimeSchedulerAsync();
+                                                     schudlerBL.AdjustTimeSchedulerAsync( );
                                                     break;
 
                                                 // Quay lại trang trước đó
@@ -309,9 +307,7 @@ internal class Program
                                         // Thực hiện 3.Thực hiện kiểm tra ra vào
                                         case 3:
 
-                                        CameraService camera = new CameraService();
-                                         
-                                        camera.TurnOn();
+                                        entryLogPL.RecoredEntryLog();
                                         break;
 
                                         case 0:

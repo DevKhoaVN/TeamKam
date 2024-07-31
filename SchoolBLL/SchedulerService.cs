@@ -12,38 +12,38 @@ namespace EntryLogManagement.SchoolBLL
     internal class SchedulerService
     {
         // Phương thức khởi động bộ lập lịch (scheduler) với các tham số thời gian mặc định và tùy chọn
-        public async Task StartScheduler(int hour1 = 12, int minute1 = 0, int hour2 = 18, int minute2 = 1)
+        public async Task StartScheduler(int hour1 , int minute1 , int hour2 , int minute2 )
         {
             try
             {
-                // Tạo một StdSchedulerFactory để quản lý các lịch trình
+                // Tạo StdSchedulerFactory để quản lí lịch
                 StdSchedulerFactory factory = new StdSchedulerFactory();
                 var scheduler = await factory.GetScheduler(); // Lấy đối tượng scheduler
                 await scheduler.Start(); // Bắt đầu chạy scheduler
 
-                // Job 1: Tạo công việc (job) PhatCanhBaoJob cho nhóm 1
+                // job 1 
                 IJobDetail job1 = JobBuilder.Create<PhatCanhBaoJob>()
                     .WithIdentity("PhatCanhBaoJobNhom1", "Nhom1") // Đặt tên công việc và nhóm
                     .Build();
 
-                // Tạo lịch trình (trigger) cho công việc 1
+                // lịch trình công việc 1
                 ITrigger trigger1 = TriggerBuilder.Create()
                     .WithIdentity("TriggerPhatCanhBaoNhom1", "Nhom1") // Đặt tên lịch trình và nhóm
                     .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(hour1, minute1)) // Lên lịch hàng ngày tại thời gian cụ thể
                     .Build();
 
-                // Job 2: Tạo công việc PhatCanhBaoJob cho nhóm 2
+                // Job 2
                 IJobDetail job2 = JobBuilder.Create<PhatCanhBaoJob>()
                     .WithIdentity("PhatCanhBaoJobNhom2", "Nhom2") // Đặt tên công việc và nhóm
                     .Build();
 
-                // Tạo lịch trình cho công việc 2
+                // Tlcihj trình công việc 2
                 ITrigger trigger2 = TriggerBuilder.Create()
                     .WithIdentity("TriggerPhatCanhBaoNhom2", "Nhom2") // Đặt tên lịch trình và nhóm
                     .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(hour2, minute2)) // Lên lịch hàng ngày tại thời gian cụ thể
                     .Build();
 
-                // Lên lịch cho công việc 1 và công việc 2 với các lịch trình tương ứng
+                // lên lịch công việc với ác lịch tương ứng
                 await scheduler.ScheduleJob(job1, trigger1);
                 await scheduler.ScheduleJob(job2, trigger2);
             }

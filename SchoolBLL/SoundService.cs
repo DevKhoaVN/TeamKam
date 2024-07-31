@@ -27,7 +27,6 @@ namespace EntryLogManagement.SchoolBLL
 
                     while (outputDevice.PlaybackState == PlaybackState.Playing && IsCount <= 5)
                     {
-                        Thread.Sleep(1000);
                         IsCount++;
                         var key = Console.ReadLine();
                         if (key != "null")
@@ -58,11 +57,10 @@ namespace EntryLogManagement.SchoolBLL
                     outputDevice.Play();
 
                     int IsCount = 0;
-                    AnsiConsole.Markup("Nhấn[green] enter để dừng âm thanh cảnh báo.[/]");
 
                     while (outputDevice.PlaybackState == PlaybackState.Playing && IsCount <= 10)
                     {
-                        Thread.Sleep(1000);
+                       
                         IsCount++;
 
                         var key = Console.ReadLine();
@@ -79,7 +77,7 @@ namespace EntryLogManagement.SchoolBLL
             }
             catch (Exception ex)
             {
-                AnsiConsole.Markup("[red]Lỗi âm thanh : " + ex.Message);
+                AnsiConsole.Markup("[red]Lỗi âm thanh :[/] " + ex.Message);
                 AnsiConsole.WriteLine();
             }
         }

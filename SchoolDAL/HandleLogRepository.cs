@@ -68,7 +68,7 @@ namespace EntryLogManagement.SchoolDAL
                                 User user = new User
                                 {
                                     ParentId = reader.IsDBNull(reader.GetOrdinal("ParentId")) ? -1 : reader.GetInt32("ParentId"),
-                                    RoleId = reader.IsDBNull(reader.GetOrdinal("RoleId")) ? -1 : reader.GetInt32("RoleId")
+                                    RoleId = reader.GetInt32("RoleId")
                                 };
                                 return user; // Trả về đối tượng User đã được tạo
                             }
